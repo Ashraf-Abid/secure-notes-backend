@@ -4,8 +4,9 @@ REST API for a note-taking application with JWT authentication and role-based ac
 
 The focus of this project is the data layer: a minimal, query-driven index strategy and the two required MongoDB aggregation pipelines.
 
-- Frontend repository: _to be added_
-- Live API: _to be added_
+- Live API: https://secure-notes-backend-o087.onrender.com/api (health check: `/api/health`)
+- Live frontend: https://secure-notes-frontend-olive.vercel.app
+- Frontend repository: https://github.com/Ashraf-Abid/secure-notes-frontend
 
 ## Tech stack
 
@@ -211,6 +212,17 @@ npm test
 46 tests covering authentication, authorization, notes, admin features, both aggregation scenarios and the index strategy. They run against a separate `secure-notes-test` database on the same cluster, which is dropped afterwards.
 
 A Postman collection is available in `docs/secure-notes.postman_collection.json`. Import it, set `baseUrl`, and run **Login** or **Login as admin** first; the token is stored automatically for the other requests.
+
+## Deployment
+
+The API runs on Render (free web service) with MongoDB Atlas.
+
+- Build command: `npm install --include=dev && npm run build` (TypeScript is a dev dependency, and npm skips those when `NODE_ENV=production`)
+- Start command: `npm start`
+- Health check path: `/api/health`
+- Environment: `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, and `CLIENT_URL` set to the frontend URL
+
+The free instance sleeps after 15 minutes without traffic, so the first request after that can take up to a minute.
 
 ## Project structure
 
