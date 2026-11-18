@@ -30,7 +30,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   }
 
   if (err instanceof mongoose.Error.CastError) {
-    return res.status(400).json({ success: false, message: `Invalid ${err.path}` });
+    return res.status(400).json({ success: false, message: `Invalid ${err.path === '_id' ? 'id' : err.path}` });
   }
 
   if (err.code === 11000) {
