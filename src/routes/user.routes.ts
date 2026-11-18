@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createUser, deleteUser, getMe, getUser, listUsers, updateUser } from '../controllers/user.controller';
+import { getUserPosts } from '../controllers/post.controller';
 import { authenticate, authorize } from '../middlewares/auth';
 import { validate } from '../middlewares/validate';
 import { createUserSchema, updateUserSchema } from '../validators/user.validator';
@@ -7,6 +8,7 @@ import { createUserSchema, updateUserSchema } from '../validators/user.validator
 const router = Router();
 
 router.get('/me', authenticate, getMe);
+router.get('/:id/posts', authenticate, getUserPosts);
 
 router.get('/', authenticate, authorize('ADMIN'), listUsers);
 router.post('/', authenticate, authorize('ADMIN'), validate(createUserSchema), createUser);

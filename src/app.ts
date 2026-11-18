@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import noteRoutes from './routes/note.routes';
 import adminRoutes from './routes/admin.routes';
+import postRoutes from './routes/post.routes';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/posts', postRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
