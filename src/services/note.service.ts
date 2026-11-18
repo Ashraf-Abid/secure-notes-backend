@@ -4,6 +4,7 @@ import { UserDocument } from '../models/User';
 import { AppError } from '../utils/AppError';
 import { buildPagination, PaginationQuery } from '../utils/pagination';
 import { CreateNoteInput, UpdateNoteInput } from '../validators/note.validator';
+import { AdminNotesQuery } from '../validators/user.validator';
 
 export function createNote(userId: Types.ObjectId, input: CreateNoteInput) {
   return Note.create({ user: userId, title: input.title, content: input.content });
@@ -19,6 +20,21 @@ export async function listUserNotes(userId: Types.ObjectId, query: PaginationQue
       .select('-__v')
       .lean(),
     Note.countDocuments(filter),
+  ]);
+  return { notes, pagination: buildPagination(query, total) };
+}
+
+export async function listAllNotes(query: AdminNotesQuery) {
+  const filter = query.userId ? { user: query.userId } : {};
+  const [notes, total] = await Promise.all([
+    Note.find(filter)
+      .sort({ _id: -1 })
+      .skip((query.page - 1) * query.limit)
+      .limit(query.limit)
+      .select('-__v')
+      .populate('user', 'name email')
+      .lean(),
+    query.userId ? Note.countDocuments(filter) : Note.estimatedDocumentCount(),
   ]);
   return { notes, pagination: buildPagination(query, total) };
 }

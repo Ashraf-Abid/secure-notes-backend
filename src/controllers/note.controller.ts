@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as noteService from '../services/note.service';
 import { paginationSchema } from '../utils/pagination';
+import { adminNotesQuerySchema } from '../validators/user.validator';
 
 export async function createNote(req: Request, res: Response) {
   const note = await noteService.createNote(req.user!._id, req.body);
@@ -10,6 +11,12 @@ export async function createNote(req: Request, res: Response) {
 export async function listMyNotes(req: Request, res: Response) {
   const query = paginationSchema.parse(req.query);
   const { notes, pagination } = await noteService.listUserNotes(req.user!._id, query);
+  res.json({ success: true, data: notes, pagination });
+}
+
+export async function listAllNotes(req: Request, res: Response) {
+  const query = adminNotesQuerySchema.parse(req.query);
+  const { notes, pagination } = await noteService.listAllNotes(query);
   res.json({ success: true, data: notes, pagination });
 }
 
