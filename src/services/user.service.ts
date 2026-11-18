@@ -4,7 +4,7 @@ import { Post } from '../models/Post';
 import { User, UserDocument } from '../models/User';
 import { AppError } from '../utils/AppError';
 import { buildPagination, PaginationQuery } from '../utils/pagination';
-import { CreateUserInput, UpdateUserInput } from '../validators/user.validator';
+import { CreateUserInput, InterestGroupsQuery, UpdateUserInput } from '../validators/user.validator';
 
 export function createUser(input: CreateUserInput) {
   return User.create({
@@ -27,6 +27,37 @@ export async function listUsers(query: PaginationQuery) {
     User.estimatedDocumentCount(),
   ]);
   return { users, pagination: buildPagination(query, total) };
+}
+
+export async function getUsersGroupedByInterests(query: InterestGroupsQuery) {
+  const match = query.interest ? { interests: query.interest } : { interests: { $type: 'string' } };
+
+  const [result] = await User.aggregate([
+    { $match: match },
+    { $unwind: '$interests' },
+    ...(query.interest ? [{ $match: { interests: query.interest } }] : []),
+    {
+      $group: {
+        _id: '$interests',
+        count: { $sum: 1 },
+        users: { $push: { _id: '$_id', name: '$name', email: '$email' } },
+      },
+    },
+    { $sort: { count: -1, _id: 1 } },
+    {
+      $facet: {
+        data: [
+          { $skip: (query.page - 1) * query.limit },
+          { $limit: query.limit },
+          { $project: { _id: 0, interest: '$_id', count: 1, users: 1 } },
+        ],
+        total: [{ $count: 'count' }],
+      },
+    },
+  ]);
+
+  const total = result.total[0]?.count ?? 0;
+  return { groups: result.data, pagination: buildPagination(query, total) };
 }
 
 export async function getUser(id: string) {

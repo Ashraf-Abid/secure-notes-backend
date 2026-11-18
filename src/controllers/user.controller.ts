@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/user.service';
 import { paginationSchema } from '../utils/pagination';
+import { interestGroupsQuerySchema } from '../validators/user.validator';
 
 export function getMe(req: Request, res: Response) {
   res.json({ success: true, data: req.user });
@@ -15,6 +16,12 @@ export async function listUsers(req: Request, res: Response) {
   const query = paginationSchema.parse(req.query);
   const { users, pagination } = await userService.listUsers(query);
   res.json({ success: true, data: users, pagination });
+}
+
+export async function getUsersGroupedByInterests(req: Request, res: Response) {
+  const query = interestGroupsQuerySchema.parse(req.query);
+  const { groups, pagination } = await userService.getUsersGroupedByInterests(query);
+  res.json({ success: true, data: groups, pagination });
 }
 
 export async function getUser(req: Request<{ id: string }>, res: Response) {

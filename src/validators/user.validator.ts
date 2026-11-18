@@ -26,6 +26,11 @@ export const adminNotesQuerySchema = paginationSchema.extend({
   userId: objectIdField.optional(),
 });
 
+export const interestGroupsQuerySchema = paginationSchema.extend({
+  interest: z.string().trim().toLowerCase().min(1).max(30).optional(),
+});
+
+export type InterestGroupsQuery = z.infer<typeof interestGroupsQuerySchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type AdminNotesQuery = z.infer<typeof adminNotesQuerySchema>;
