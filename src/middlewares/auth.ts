@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
-import { User } from '../models/User';
+import { Role, User } from '../models/User';
 import { AppError } from '../utils/AppError';
 import { verifyToken } from '../utils/jwt';
 
@@ -25,3 +25,10 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   req.user = user;
   next();
 }
+
+export const authorize = (...roles: Role[]) => (req: Request, _res: Response, next: NextFunction) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    throw new AppError(403, 'You do not have permission to perform this action');
+  }
+  next();
+};
