@@ -2,8 +2,6 @@ import dotenv from 'dotenv';
 
 dotenv.config({ quiet: true });
 
-// Fail fast at startup if a required variable is missing,
-// instead of crashing later in the middle of a request.
 function required(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -17,4 +15,6 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   mongoUri: required('MONGODB_URI'),
+  jwtSecret: required('JWT_SECRET'),
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
 };

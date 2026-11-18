@@ -1,8 +1,3 @@
-// Makes the database indexes match exactly what the schemas define, then
-// prints them. syncIndexes() creates missing indexes AND drops any index that
-// is no longer declared in a schema, so no stale/unnecessary index survives.
-//
-// Usage: npm run db:indexes
 import mongoose from 'mongoose';
 import { connectDB, disconnectDB } from '../config/db';
 import { User } from '../models/User';
