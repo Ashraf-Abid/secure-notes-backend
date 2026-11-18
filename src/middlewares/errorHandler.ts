@@ -42,6 +42,10 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     return res.status(400).json({ success: false, message: 'Invalid JSON body' });
   }
 
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ success: false, message: 'Request body too large' });
+  }
+
   console.error(err);
   res.status(500).json({
     success: false,
