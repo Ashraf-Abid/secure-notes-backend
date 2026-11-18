@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 import { Note } from '../models/Note';
 import { Post } from '../models/Post';
 import { User, UserDocument } from '../models/User';
@@ -29,10 +29,10 @@ export async function listUsers(query: PaginationQuery) {
   return { users, pagination: buildPagination(query, total) };
 }
 
-export async function getUsersGroupedByInterests(query: InterestGroupsQuery) {
+export function interestGroupsPipeline(query: InterestGroupsQuery): PipelineStage[] {
   const match = query.interest ? { interests: query.interest } : { interests: { $type: 'string' } };
 
-  const [result] = await User.aggregate([
+  return [
     { $match: match },
     { $unwind: '$interests' },
     ...(query.interest ? [{ $match: { interests: query.interest } }] : []),
@@ -54,7 +54,11 @@ export async function getUsersGroupedByInterests(query: InterestGroupsQuery) {
         total: [{ $count: 'count' }],
       },
     },
-  ]);
+  ];
+}
+
+export async function getUsersGroupedByInterests(query: InterestGroupsQuery) {
+  const [result] = await User.aggregate(interestGroupsPipeline(query));
 
   const total = result.total[0]?.count ?? 0;
   return { groups: result.data, pagination: buildPagination(query, total) };

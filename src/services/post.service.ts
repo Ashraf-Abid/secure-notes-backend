@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 import { Post } from '../models/Post';
 import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
@@ -24,7 +24,18 @@ export async function listPosts(query: PaginationQuery) {
 }
 
 export async function getUserPosts(userId: Types.ObjectId, query: PaginationQuery) {
-  const [result] = await User.aggregate([
+  const [result] = await User.aggregate(userPostsPipeline(userId, query));
+
+  if (!result) throw new AppError(404, 'User not found');
+  return {
+    user: result.user,
+    posts: result.posts,
+    pagination: buildPagination(query, result.total),
+  };
+}
+
+export function userPostsPipeline(userId: Types.ObjectId, query: PaginationQuery): PipelineStage[] {
+  return [
     { $match: { _id: userId } },
     {
       $lookup: {
@@ -56,12 +67,5 @@ export async function getUserPosts(userId: Types.ObjectId, query: PaginationQuer
         total: { $ifNull: [{ $first: '$postCount.count' }, 0] },
       },
     },
-  ]);
-
-  if (!result) throw new AppError(404, 'User not found');
-  return {
-    user: result.user,
-    posts: result.posts,
-    pagination: buildPagination(query, result.total),
-  };
+  ];
 }

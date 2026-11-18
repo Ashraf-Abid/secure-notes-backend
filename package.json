@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "test": "tsx --test tests/index.test.ts",
     "start": "node dist/server.js",
     "db:indexes": "tsx src/scripts/syncIndexes.ts",
     "seed:admin": "tsx src/scripts/createAdmin.ts",
